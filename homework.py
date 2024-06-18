@@ -40,7 +40,6 @@ logging.basicConfig(
 
 def check_tokens():
     """Функция проверяет доступность переменных окружения."""
-
     for key in (PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID):
         try:
             if not key:
@@ -53,8 +52,7 @@ def check_tokens():
 
 
 def send_message(bot, message):
-    """Функция отправляем сообщение в чат"""
-
+    """Функция отправляем сообщение в чат."""
     try:
         bot.send_message(
             chat_id=TELEGRAM_CHAT_ID,
@@ -67,11 +65,7 @@ def send_message(bot, message):
 
 
 def get_api_answer(timestamp):
-    """
-    Функция выполняет GET-запрос к кэндпоинту API,
-    чтобы получить статус домашнего задания.
-    """
-
+    """Функция выполняет GET-запрос к кэндпоинту API."""
     try:
         response = requests.get(
             ENDPOINT, headers=HEADERS, params={'from_date': timestamp}
@@ -94,7 +88,6 @@ def get_api_answer(timestamp):
 
 def check_response(response):
     """Проверяем получен ли ответ от API."""
-
     if not response:
         message = 'Ответ от API не получен'
         logging.error(message)
@@ -116,8 +109,7 @@ def check_response(response):
 
 
 def parse_status(homework):
-    """Извлекаем из ответа API имя работы и статут ее проверки"""
-
+    """Извлекаем из ответа API имя работы и статут ее проверки."""
     try:
         homework_name = homework['homework_name']
         status = homework['status']
@@ -138,13 +130,11 @@ def parse_status(homework):
 
 def days_to_seconds(days):
     """Функция для перевода дней в секунды."""
-
     return days * 24 * 60 * 60
 
 
 def main():
     """Основная логика работы бота."""
-
     check_tokens()
 
     bot = TeleBot(token=TELEGRAM_TOKEN)
