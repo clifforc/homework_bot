@@ -30,25 +30,37 @@ HOMEWORK_VERDICTS = {
 }
 
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    filename='program.log',
-    filemode='w',
-    format='%(asctime)s - %(levelname)s - %(message)s - %(name)s'
-)
+def setup_logging():
+    """Функция устанавливает настройки логирования."""
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
+    formatter = logging.Formatter(
+        '%(asctime)s - %(levelname)s - %(message)s - %(name)s'
+    )
+
+    stream_handler = logging.StreamHandler()
+    stream_handler.setLevel(logging.DEBUG)
+    stream_handler.setFormatter(formatter)
+
+    file_handler = logging.FileHandler('program.log', "w")
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(formatter)
+
+    logger.addHandler(stream_handler)
+    logger.addHandler(file_handler)
 
 
 def check_tokens():
     """Функция проверяет доступность переменных окружения."""
-    for key in (PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID):
-        try:
-            if not key:
-                raise ValueError(
-                    f'Токен {key} отсутствует! Проверь .evn файл.'
-                )
-        except ValueError as error:
-            logging.critical(error)
-            sys.exit()
+    tokens = [PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID]
+    try:
+        if not all(tokens):
+            raise ValueError(
+                'Один или несколько токенов отсутствуют! Проверь .env файл.'
+            )
+    except ValueError as error:
+        logging.critical(error)
+        sys.exit(str(error))
 
 
 def send_message(bot, message):
@@ -91,7 +103,6 @@ def check_response(response):
     if not response:
         message = 'Ответ от API не получен'
         logging.error(message)
-        print(message)
         return False
     if not isinstance(response, dict):
         message = 'Ответ от API не является словарём.'
@@ -135,6 +146,7 @@ def days_to_seconds(days):
 
 def main():
     """Основная логика работы бота."""
+    setup_logging()
     check_tokens()
 
     bot = TeleBot(token=TELEGRAM_TOKEN)
@@ -167,7 +179,6 @@ def main():
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
             logging.error(message)
-            print(message)
             break
 
         finally:
